@@ -14,7 +14,7 @@ from pyActionRecog import parse_split_file
 from pyActionRecog.utils.video_funcs import default_aggregation_func
 
 parser = argparse.ArgumentParser()
-parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51'])
+parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'ActNet200'])
 parser.add_argument('split', type=int, choices=[1, 2, 3],
                     help='on which split to test the network')
 parser.add_argument('modality', type=str, choices=['rgb', 'flow'])
@@ -49,6 +49,14 @@ gpu_list = args.gpus
 eval_video_list = split_tp[args.split - 1][1]
 
 score_name = 'fc-action'
+#changing this for activity net dataset
+if args.dataset == 'ActNet200':
+    score_name = 'fc-action200'
+    eval_video_list = split_tp[0][1]
+else:
+    score_name = 'fc-action'
+    eval_video_list = split_tp[args.split - 1][1]
+
 
 
 def build_net():
@@ -113,6 +121,8 @@ def eval_video(video):
 
 if args.num_worker > 1:
     pool = multiprocessing.Pool(args.num_worker, initializer=build_net)
+    #print('Eval_video is',eval_video)
+    #print('Eval_video_list is',eval_video_list)
     video_scores = pool.map(eval_video, eval_video_list)
 else:
     build_net()

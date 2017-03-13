@@ -111,3 +111,24 @@ def parse_hmdb51_splits():
         ]
         splits.append((train_list, test_list))
     return splits
+
+def parse_activity_net_splits():
+    class_ind = [x.strip().split() for x in open('data/ActNet_splits/ActNetClassesInd.txt')]
+    class_mapping = {x[1]:int(x[0])-1 for x in class_ind}
+    
+    def line2rec(line):
+	items = line.strip().split('/')
+	label = class_mapping[items[6]]
+	vidmid = items[7]
+	vidnext = vidmid.strip().split(' ')
+	vid =vidnext[0]#items[6]+'/'+vidnext[0]
+	print('Label is',label)
+	print('Videos is',vid)
+	return vid, label
+
+    splits = []
+    train_list = [line2rec(x) for x in open('data/ActNet_splits/ActNetflowTrainSplit.txt')]
+    test_list = [line2rec(x) for x in open('data/ActNet_splits/ActNetflowValidSplit.txt')]
+    splits.append((train_list, test_list))
+    return splits
+
